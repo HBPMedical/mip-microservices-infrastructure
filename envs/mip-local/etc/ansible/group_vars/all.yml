@@ -1,0 +1,67 @@
+---
+
+python_location: "/usr/bin/python3"
+python_pip: "/usr/bin/pip3"
+
+java_oracle_distribution: "jdk"
+
+#######################################################################
+# 0. Technical Management Runtime
+# port range 1000-1099
+tmr_mesos_leader_port: "1050"
+tmr_mesos_follower_port: "1051"
+
+tmr_zk_port: "1052"
+tmr_zk_leader_port: "1053"
+tmr_zk_election_port: "1054"
+
+tmr_marathon_port: "1080"
+
+tmr_hostname: "{{ inventory_hostname }}"
+tmr_timezone: "Europe/Zurich"
+tmr_postfix_mode: "smarthost"
+# postfix smarthost only needed if ffm_postfix_mode equals "smarthost"
+tmr_fqdn_smtp_relay: "mail.epfl.ch"
+
+tmr_unattended_mail: "lionel.sambuc@epfl.ch"
+tmr_host_domain: "epfl.ch"
+
+tmr_dns_servers: "--dns 128.178.15.228 --dns 128.178.15.229"
+
+#######################################################################
+# 1. Data factory
+# port range 1100-1199
+airflow_web_server_port: "1180"
+
+#######################################################################
+# 2. Hospital Databases Bundle
+# port range 1200-1299
+hdb_hostname: "{{ tmr_hostname }}"
+hdb_port: "1200"
+hdb_ui_port: "1201"
+hdb_data_dir: '/srv/docker/ldsmdb/data'
+hdb_raw_data_dir: "/data/ldsm"
+
+hdb_federation_master_host: "{{ hdb_hostname }}"
+hdb_federation_master_port: "1290"
+hdb_federation_db_user: "admin"
+
+#######################################################################
+# 3. Algorithm factory
+# port range 1300-1399
+af_hostname: "{{ tmr_hostname }}"
+af_db_port: "1300"
+af_chronos_port: "1301"
+af_woken_http_port: "1387"
+af_woken_akka_port: "1388"
+af_woken_validation_akka_port: "1389"
+
+#######################################################################
+# 4. Web Portal
+# port range 1400-1499
+wp_hostname: "{{ tmr_hostname }}"
+wp_frontend_port: "1490"
+wp_backend_port: "1480"
+wp_db_port: "1400"
+wp_db_hostname: "{{ tmr_hostname }}"
+wp_frontend_scheme: "https"

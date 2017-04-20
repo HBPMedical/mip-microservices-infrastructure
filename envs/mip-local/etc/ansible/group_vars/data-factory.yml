@@ -1,0 +1,175 @@
+---
+
+#######################################################################
+# 1. Data factory
+
+########################################
+# Data Factory global settings
+
+#data_factory_datasets: "CLM,LREN,PPMI"
+data_factory_datasets: ""
+data_factory_datasets_root: "/mnt/datasets"
+data_factory_datasets_incoming: "{{ data_factory_datasets_root }}/original"
+data_factory_datasets_organised: "{{ data_factory_datasets_root }}/organised"
+data_factory_datasets_backup: "{{ data_factory_datasets_root }}/backup"
+data_factory_datasets_output: "{{ data_factory_datasets_root }}/processed"
+data_factory_email_errors_to: "lionel.sambuc@epfl.ch"
+data_factory_slack_channel: "#chuv-data"
+data_factory_slack_channel_user: "Airflow"
+
+########################################
+# Airflow configuration
+
+# Grant lots of CPUs to Airflow scheduler as it's going to spawn local Airflow instances for each task.
+# TODO: remove this once Mesos scheduler is used, set it back to 1.0
+airflow_scheduler_cpus: 1.0
+airflow_scheduler_mem: 256.0
+airflow_webserver_cpus: 0.2
+airflow_webserver_mem: 358.0
+
+airflow_web_server_host: "{{ tmr_hostname }}" # use 0.0.0.0 to grant access to all
+airflow_web_base_url: "http://{{ tmr_hostname }}:{{ airflow_web_server_port }}"
+
+airflow_scheduler_expected_activity_period: "2 hours"
+airflow_job_heartbeat_sec: 30
+airflow_scheduler_heartbeat_sec: 30
+
+airflow_db_host: "{{ tmr_hostname }}"
+airflow_db_port: "1121"
+airflow_sql_alchemy_conn: "postgresql://airflow:{{ airflow_db_password }}@{{ airflow_db_host }}:{{ airflow_db_port }}/airflow"
+
+airflow_scripts_root: "/opt/airflow-scripts"
+airflow_scripts_verify_commit: true
+airflow_dags_folder: "{{ airflow_scripts_root }}/airflow-mri-preprocessing-dags"
+airflow_plugins_folder: "{{ airflow_scripts_root }}/airflow-imaging-plugins"
+
+airflow_load_examples: true
+
+airflow_smtp_enable: false
+airflow_smtp_host: "{{ tmr_fqdn_smtp_relay }}"
+airflow_smtp_starttls: false
+airflow_ssl: false
+#airflow_smtp_user: "None"
+#airflow_smtp_password: "None"
+airflow_smtp_port: 25
+airflow_smtp_mail_from: "{{ ffm_fqdn_hostname }}"
+
+airflow_user: "airflow"
+airflow_group: "airflow"
+airflow_home: "/usr/local/airflow"
+airflow_startup: "marathon"
+airflow_mesos_master: "{{ mesos_hostname }}:{{ mesos_leader_port }}"
+airflow_db_databases: "airflow,data_catalog,i2b2,mipmap"
+
+airflow_pool_io_intensive: 1
+airflow_pool_remote_file_copy: 1
+airflow_pool_image_preprocessing: 1
+
+########################################
+# Databases configuration
+
+data_catalog_db_deploy: no
+data_catalog_db_host: "{{ airflow_db_host }}"
+data_catalog_db_port: "{{ airflow_db_port }}"
+data_catalog_db_sql_alchemy_conn: "postgresql://data_catalog:{{ data_catalog_db_password }}@{{ data_catalog_db_host }}:{{ data_catalog_db_port }}/data_catalog"
+
+i2b2_db_deploy: no
+i2b2_db_host: "{{ airflow_db_host }}"
+i2b2_db_port: "{{ airflow_db_port }}"
+i2b2_db_sql_alchemy_conn: "postgresql://i2b2:{{ i2b2_db_password }}@{{ i2b2_db_host }}:{{ i2b2_db_port }}/i2b2"
+
+mipmap_db_deploy: no
+mipmap_db_host: "{{ airflow_db_host }}"
+mipmap_db_port: "{{ airflow_db_port }}"
+mipmap_db_config_file: "/dev/null"
+
+########################################
+# Configuration for CLM dataset
+
+clm_dataset_label: "CLM"
+clm_reorganise_input_folder: "{{ data_factory_datasets_incoming }}/CLM"
+clm_reorganise_scanners: "daily"
+clm_reorganise_min_free_space: 0.3
+clm_reorganise_pipelines: "copy_to_local,nifti_organiser,scan_folder"
+clm_reorganise_pipelines_copy_to_local_output_folder: "{{ data_factory_datasets_root }}/local/CLM"
+clm_reorganise_pipelines_nifti_organiser_output_folder: "{{ data_factory_datasets_organised }}/CLM"
+clm_reorganise_pipelines_nifti_organiser_output_folder_structure: "#PatientID/#AcquisitionDate/#SeriesDescription/#SeriesDate"
+clm_reorganise_nifti_organiser_docker_image: "hbpmip/hierarchizer"
+clm_reorganise_nifti_organiser_version: "{{ hierarchizer_version }}"
+clm_reorganise_scan_folder_depth: 1
+clm_preprocessing_input_config: "boost"
+clm_preprocessing_max_active_runs: 30
+clm_preprocessing_min_free_space: 0.3
+clm_preprocessing_misc_library_path: "{{ airflow_scripts_root }}/mri-preprocessing-pipeline/MiscellaneousAndOthers"
+clm_preprocessing_pipelines_path: "{{ airflow_scripts_root }}/mri-preprocessing-pipeline/Pipelines"
+clm_preprocessing_protocols_definition_file: "{{ airflow_scripts_root }}/mri-preprocessing-pipeline/Protocols_definition.txt"
+clm_preprocessing_scanners: ""
+clm_preprocessing_pipelines: "neuro_morphometric_atlas,export_features,catalog_to_i2b2"
+clm_preprocessing_mpm_maps_output_folder: "{{ data_factory_datasets_organised }}/CLM/mpm_maps"
+clm_preprocessing_neuro_morphometric_atlas_output_folder: "{{ data_factory_datasets_organised }}/CLM/neuro_morphometric_atlas"
+clm_ehr_min_free_space: 0.3
+clm_ehr_scanners: ""
+clm_ehr_map_ehr_to_i2b2_docker_image: "hbpmip/mipmap-demo-ehr-to-i2b2"
+clm_ehr_map_ehr_to_i2b2_version: "{{ map_ehr_to_i2b2_version }}"
+clm_ehr_version_incoming_ehr_output_folder: "{{ data_factory_datasets_organised }}/CLM/ehr_versioned"
+
+########################################
+# Configuration for LREN dataset
+
+main_dataset_label: "LREN"
+main_preprocessing_input_folder: "{{ data_factory_datasets_incoming }}/CRN/LREN/IRMMP16/prisma"
+main_preprocessing_input_config: "boost"
+main_preprocessing_max_active_runs: 30
+main_preprocessing_min_free_space: 0.3
+main_preprocessing_misc_library_path: "{{ airflow_scripts_root }}/mri-preprocessing-pipeline/MiscellaneousAndOthers"
+main_preprocessing_pipelines_path: "{{ airflow_scripts_root }}/mri-preprocessing-pipeline/Pipelines"
+main_preprocessing_protocols_definition_file: "{{ airflow_scripts_root }}/mri-preprocessing-pipeline/Protocols_definition.txt"
+main_preprocessing_scanners: "daily" # TODO add continuous
+main_preprocessing_pipelines: "dicom_to_nifti,mpm_maps,neuro_morphometric_atlas,export_features,catalog_to_i2b2"
+main_preprocessing_copy_to_local_output_folder: "{{ data_factory_datasets_root }}/local/LREN"
+main_preprocessing_dicom_to_nifti_output_folder: "{{ data_factory_datasets_organised }}/LREN/nifti"
+main_preprocessing_dicom_to_nifti_backup_folder: "{{ data_factory_datasets_backup }}/LREN/nifti"
+main_preprocessing_mpm_maps_output_folder: "{{ data_factory_datasets_organised }}/LREN/mpm_maps"
+main_preprocessing_mpm_maps_backup_folder: "{{ data_factory_datasets_backup }}/LREN/mpm_maps"
+main_preprocessing_mpm_maps_protocols_definition_file: "{{ airflow_scripts_root }}/mri-preprocessing-pipeline/Protocols_definition.txt"
+main_preprocessing_neuro_morphometric_atlas_output_folder: "{{ data_factory_datasets_organised }}/LREN/neuro_morphometric_atlas"
+main_preprocessing_neuro_morphometric_atlas_backup_folder: "{{ data_factory_datasets_backup }}/LREN/neuro_morphometric_atlas"
+main_ehr_min_free_space: 0.3
+main_ehr_scanners: ""
+main_ehr_pipelines: ""
+
+########################################
+# Configuration for PPMI dataset
+
+ppmi_dataset_label: "PPMI"
+ppmi_preprocessing_input_folder: "/mnt/filerc/LREN/SHARE/Temp/4Arnaud/PPMI/"
+ppmi_preprocessing_input_config: "boost"
+ppmi_preprocessing_max_active_runs: 30
+ppmi_preprocessing_min_free_space: 0.3
+ppmi_preprocessing_misc_library_path: "{{ airflow_scripts_root }}/mri-preprocessing-pipeline/Miscellaneous&Others"
+ppmi_preprocessing_pipelines_path: "{{ airflow_scripts_root }}/mri-preprocessing-pipeline/Pipelines"
+ppmi_preprocessing_protocols_definition_file: "{{ airflow_scripts_root }}/mri-preprocessing-pipeline/Protocols_definition.txt"
+ppmi_preprocessing_scanners: "flat"
+ppmi_preprocessing_pipelines: "dicom_organiser,dicom_to_nifti,mpm_maps,neuro_morphometric_atlas,export_features,catalog_to_i2b2"
+ppmi_preprocessing_copy_to_local_output_folder: "/mnt/HDD2/PPMI/incoming"
+ppmi_preprocessing_dicom_organiser_output_folder: "/mnt/HDD2/PPMI/dicom_organiser"
+ppmi_preprocessing_dicom_organiser_output_folder_structure: "#PatientID/#AcquisitionDate/#SeriesDescription/#SeriesDate"
+ppmi_preprocessing_dicom_organiser_docker_image: "hbpmip/hierarchizer"
+ppmi_preprocessing_dicom_organiser_version: "{{ hierarchizer_version }}"
+ppmi_preprocessing_dicom_to_nifti_output_folder: "/mnt/HDD2/PPMI/nifti"
+ppmi_preprocessing_dicom_to_nifti_pipeline_path: "{{ airflow_scripts_root }}/mri-preprocessing-pipeline/Pipelines"
+ppmi_preprocessing_mpm_maps_output_folder: "/mnt/HDD2/PPMI/mpm_maps"
+ppmi_preprocessing_neuro_morphometric_atlas_output_folder: "/mnt/HDD2/PPMI/neuro_morphometric_atlas"
+ppmi_ehr_input_folder: "/mnt/filerc/LREN/SHARE/Temp/4Arnaud/PPMI_donnees_ALL"
+ppmi_ehr_input_folder_depth: 0
+ppmi_ehr_min_free_space: 0.3
+ppmi_ehr_scanners: "flat"
+ppmi_ehr_pipelines: ""
+ppmi_ehr_map_ehr_to_i2b2_docker_image: "hbpmip/mipmap-demo-ehr-to-i2b2"
+ppmi_ehr_map_ehr_to_i2b2_version: "{{ map_ehr_to_i2b2_version }}"
+ppmi_ehr_version_incoming_ehr_output_folder: "/mnt/HDD2/PPMI/ehr_versioned"
+
+########################################
+# SPM configuration
+
+spm_dir: /opt/spm12

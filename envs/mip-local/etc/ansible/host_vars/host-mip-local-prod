@@ -1,0 +1,78 @@
+---
+#######################################################################
+# 0. Technical Management Runtime
+ffm_root_password: "start1234"
+ffm_deploy_password: "start1234"
+ffm_fqdn_hostname: "m64006a327bae.dyn.epfl.ch"
+
+# Firewall is not yet activated...
+firewall_open_tcp_ports:
+# technical-runtime
+  # ssh
+  - 22
+
+# data-factory
+
+# hospital-databases-bundle
+
+# algorithm-factory
+
+# web-portal
+
+# Firewall is not yet activated...
+firewall_open_udp_ports:
+# technical-runtime
+
+# data-factory
+
+# hospital-databases-bundle
+
+# algorithm-factory
+
+# web-portal
+
+# Firewall is not yet activated...
+firewall_whitelisted_hosts:
+#  - '155.105.223.24'
+
+#######################################################################
+# Administration
+#slack_client_id: 75396352240.118514576100
+#slack_client_secret: start1234
+#slack_token: xoxp-start1234
+
+#######################################################################
+# 1. Data factory
+airflow_db_password: "start1234"
+airflow_db_admin_password: "start1234"
+
+mri_db_password: "start1234"
+mri_db_admin_password: "{{ airflow_db_admin_password }}"
+
+#######################################################################
+# 2. Hospital Databases Bundle
+ldsm_db_admin_password: "start1234"
+
+#######################################################################
+# 3. Algorithm factory
+
+# For woken
+science_db_admin_password: 'start1234'
+science_db_password: 'start1234'
+
+analytics_db_admin_password: "{{ science_db_admin_password }}"
+analytics_db_password: "start1234"
+
+federation_db_password: "admin"
+
+#######################################################################
+# 4. Web Portal
+
+portal_db_admin_password: "start1234"
+portal_db_password: "start1234"
+
+meta_db_admin_password: "{{ portal_db_admin_password }}"
+meta_db_password: "start1234"
+
+portal_backend_hbp_client_id: 996f97c5-a3ca-460e-b18b-00df3e2be89a
+portal_backend_hbp_client_secret: start1234

@@ -1,0 +1,73 @@
+---
+#######################################################################
+# Web Portal
+
+portal_frontend_marathon_host: "{{ marathon_hostname }}"
+portal_frontend_scheme: "{{ wp_frontend_scheme }}"
+portal_frontend_virtual_host: 'mip.humanbrainproject.eu'
+portal_frontend_docker_network: BRIDGE
+portal_frontend_port: "{{ wp_frontend_port }}"
+portal_frontend_cpus: 0.5
+portal_frontend_mem: 20.0
+# Enable Google Analytics
+enable_analytics: true
+tracker_id: 'UA-80660232-1'
+
+portal_backend_marathon_host: "{{ marathon_hostname }}"
+portal_backend_marathon_constraints: [["hostname", "UNIQUE"],["hostname", "LIKE", "{{ ffm_fqdn_hostname }}"]]
+portal_backend_instances: 1
+portal_backend_port: "{{ wp_backend_port }}"
+portal_backend_cpus: 0.5
+portal_backend_mem: 1024.0
+portal_backend_exareme_url: "http://{{ hdb_federation_master_host }}:{{ hdb_federation_master_port }}"
+portal_backend_frontend_login_url: "{{ portal_frontend_scheme }}://{{ portal_frontend_virtual_host }}/services/login/hbp"
+portal_backend_frontend_after_login_url: "{{ portal_frontend_scheme }}://{{ portal_frontend_virtual_host }}/home"
+portal_backend_frontend_after_logout_url: "{{ portal_frontend_scheme }}://{{ portal_frontend_virtual_host }}/services/login/hbp"
+
+portal_db_host: "{{ wp_db_hostname }}"
+portal_db_port: "{{ wp_db_port }}"
+portal_db_user: "portal"
+portal_db_jdbc_url: "jdbc:postgresql://{{ portal_db_host }}:{{ portal_db_port }}/portal"
+portal_db_jdbc_driver: "org.postgresql.Driver"
+portal_db_jdbc_jar: "/usr/lib/R/libraries/postgresql-9.4-1201.jdbc41.jar"
+portal_db_admin_user: "postgres"
+portal_db_databases: "portal,meta"
+portal_db_marathon_host: "{{ marathon_hostname }}"
+
+# Deploy meta database inside the same Postgres instance created for portal db
+meta_db_deploy: no
+meta_db_host: "{{ portal_db_host }}"
+meta_db_port: "{{ portal_db_port }}"
+meta_db_jdbc_url: "jdbc:postgresql://{{ meta_db_host }}:{{ meta_db_port }}/meta"
+meta_db_local_project_dir: '{{ play_dir }}/src/meta-db'
+meta_db_user: meta
+meta_db_admin_user: "postgres"
+
+portal_backend_env:
+  PORTAL_DB_URL: "{{ portal_db_jdbc_url }}"
+  PORTAL_DB_SCHEMA: "public"
+  PORTAL_DB_USER: "{{ portal_db_user }}"
+  PORTAL_DB_PASSWORD: "{{ portal_db_password }}"
+  META_DB_URL: "{{ meta_db_jdbc_url }}"
+  META_DB_SCHEMA: "public"
+  META_DB_USER: "{{ meta_db_user }}"
+  META_DB_PASSWORD: "{{ meta_db_password }}"
+  SCIENCE_DB_URL: "{{ science_db_jdbc_url }}"
+  SCIENCE_DB_SCHEMA: "public"
+  SCIENCE_DB_MAIN_TABLE: "adni_merge"
+  SCIENCE_DB_USER: "{{ science_db_user }}"
+  SCIENCE_DB_PASSWORD: "{{ science_db_password }}"
+  AUTHENTICATION: 1
+  CLIENT_ID: "{{ portal_backend_hbp_client_id }}"
+  CLIENT_SECRET: "{{ portal_backend_hbp_client_secret }}"
+  LOGGING_LEVEL_WEB: "INFO"
+  LOGGING_LEVEL_HIBERNATE: "INFO"
+  CONTEXT_PATH: ""
+  SESSION_TIMEOUT: "2592000"
+  WOKEN_URL: "{{ internal_woken_url }}"
+  EXAREME_URL: "{{ portal_backend_exareme_url }}"
+  FRONTEND_LOGIN_URL: "{{ portal_backend_frontend_login_url }}"
+  FRONTEND_AFTER_LOGIN_URL: "{{ portal_backend_frontend_after_login_url }}"
+  FRONTEND_AFTER_LOGOUT_URL: "{{ portal_backend_frontend_after_logout_url }}"
+
+internal_portal_backend_server: "{{ portal_backend_host }}:{{ portal_backend_port }}"
