@@ -3,7 +3,7 @@
 
 # All machines known to Ansible
 [all]
-host-mip-local-prod ip_address=10.0.2.15 ansible_connection=ssh ansible_host=m64006a327bae.dyn.epfl.ch ansible_port=2222 #if needed ansible_ssh_private_key_file=/home/sambuc/.ssh/id_rsa
+host-mip-local-prod ip_address=192.168.34.66 ansible_connection=ssh ansible_host=127.0.0.1 ansible_port=2222 ansible_ssh_user=ubuntu ansible_ssh_private_key_file=/home/ludovic/.ssh/id_rsa
 
 # Managed hosts should contain all servers in the datacenter.
 # Common software, configuration and security settings will be applied on them.
@@ -26,15 +26,11 @@ host-mip-local-prod
 [zookeeper]
 host-mip-local-prod
 
-[marathon]
-#host-mip-local-prod
-
 # So that variables are shared among all members of the meta-group
-[technical-runtime:children]
+[infrastructure:children]
 docker-registry
 mesos-mixed
 zookeeper
-marathon
 
 #######################################################################
 # 1. Data factory

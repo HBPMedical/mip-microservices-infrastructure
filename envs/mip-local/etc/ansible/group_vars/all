@@ -12,8 +12,6 @@ tmr_mesos_leader_port: "1050"
 tmr_mesos_follower_port: "1051"
 
 tmr_zk_port: "1052"
-tmr_zk_leader_port: "1053"
-tmr_zk_election_port: "1054"
 
 tmr_marathon_port: "1080"
 

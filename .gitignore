@@ -7,3 +7,5 @@ RUNNING_PID
 *.pyc
 ._*
 .DS_Store
+*.log
+

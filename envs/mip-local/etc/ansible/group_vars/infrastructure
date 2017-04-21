@@ -47,9 +47,6 @@ zookeeper_hosts:
   - host: "{{ tmr_hostname }}" # the machine running zookeeper
     id: 1
 
-zookeeper_leader_port: "{{ tmr_zk_leader_port }}"
-zookeeper_election_port: "{{ tmr_zk_election_port }}"
-
 client_port: "{{ tmr_zk_port }}"
 
 ########################################
