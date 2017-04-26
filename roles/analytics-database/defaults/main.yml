@@ -9,9 +9,8 @@ analytics_db_marathon_host: '{{ inventory_hostname }}'
 # TODO: use user remapping when this functionality will be available per run (not possible today with Docker 1.12)
 analytics_db_docker_user: '999'
 
-# postgresql
-postgres_version: "9.5.4"
 analytics_db_image: 'postgres'
+postgres_version: "9.5.4"
 analytics_db_version: "{{ postgres_version }}"
 postgres_is_ready: "/usr/local/bin/pg_isready"
 analytics_db_is_ready: "{{ postgres_is_ready }}"

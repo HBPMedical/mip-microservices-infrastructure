@@ -26,9 +26,15 @@
     docker_port_mappings:
       - hostPort: "{{ chronos_port }}"
         containerPort: 4400
+        name: 'http'
+      #- hostPort: "{{ chronos_libprocess_port }}"
+      #  containerPort: 8081
+      #  name: 'libprocess'
     docker_parameters: '{{ chronos_docker_parameters }}'
     container_volumes: []
     env:
+      PORT0: 4400
+      PORT1: 8081
       CHRONOS_HTTP_PORT: 4400
       CHRONOS_MASTER: "{{ chronos_zk_mesos_master }}"
       CHRONOS_ZK_HOSTS: "{{ chronos_zk_hosts }}"

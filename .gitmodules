@@ -4,7 +4,7 @@
 	branch = master
 [submodule "roles/marathon"]
 	path = roles/marathon
-	url = https://github.com/ludovicc/ansible-marathon.git
+	url = https://github.com/LREN-CHUV/ansible-marathon.git
 	branch = master
 [submodule "roles/marathon-app"]
 	path = roles/marathon-app
@@ -16,7 +16,7 @@
 	branch = master
 [submodule "roles/mesos"]
 	path = roles/mesos
-	url = https://github.com/ludovicc/ansible-mesos.git
+	url = https://github.com/LREN-CHUV/ansible-mesos.git
 	branch = master
 [submodule "roles/silpion.util"]
 	path = roles/silpion.util

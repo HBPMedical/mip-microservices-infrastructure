@@ -14,4 +14,4 @@
 
     - name: "Install git-crypt, required to read protected configuration files in this Ansible project"
       apt: name=git-crypt state=present
-      when: (ansible_distribution == "Ubuntu" and ansible_distribution_version | version_compare('15.10', 'lt'))
+      when: ansible_distribution == "Ubuntu"

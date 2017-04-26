@@ -85,7 +85,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Run provisioning with ansible
   config.vm.provision "ansible" do |ansible|
-      ansible.playbook = "../install.yml"
+      ansible.playbook = "install.yml"
       ansible.inventory_path = "etc/ansible/hosts"
       ansible.limit = 'all'
       ansible.verbose = "v"

@@ -25,7 +25,7 @@ woken_validation_docker_image_basename: hbpmip/woken-validation
 woken_validation_docker_image: "{{ woken_validation_docker_image_basename }}:{{ woken_validation_version }}"
 
 # Attach woken validation application to a particular host. The hostname should be the name known by Marathon / Mesos
-#woken_marathon_host:
+woken_validation_marathon_host: "{{ marathon_hostname }}"
 # Set of constraints to use to place woken on some particular host(s)
 woken_validation_marathon_constraints: [["hostname", "CLUSTER", "{{ woken_validation_marathon_host }}"]]
 
@@ -34,4 +34,4 @@ woken_validation_dependencies:
   - "{{ woken_marathon_id }}"
 
 # URL to Marathon master internal to the current cluster. You need to ensure that Ansible can reach that URL.
-internal_marathon_url: http://localhost:5080
+internal_marathon_url: "http://{{ marathon_hostname }}:{{ marathon_port }}"

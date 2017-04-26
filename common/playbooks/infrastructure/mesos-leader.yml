@@ -16,8 +16,6 @@
     - "{{ play_dir }}/vars/versions.yml"
 
   pre_tasks:
-    - name: Install curl
-      apt: name=curl state=present
 
     - name: Set default value for skipped_roles
       set_fact:
@@ -38,14 +36,10 @@
       when: "'marathon' not in skipped_roles"
 
     - role: marathon
-      marathon_env_vars:
-        - "JAVA_OPTS=-Xmx512m"
       tags: ['mesos-frameworks', 'marathon']
       when: "'marathon' not in skipped_roles"
 
     #- role: mesos-ui
-    #  marathon_env_vars:
-    #    - "JAVA_OPTS=-Xmx512m"
     #  tags: ['mesos-frameworks', 'mesos-ui']
     #  when: "'mesos-ui' not in skipped_roles"
 

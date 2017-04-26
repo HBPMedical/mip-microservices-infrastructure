@@ -1,9 +1,9 @@
 ---
 
-ldsm_db_marathon_id: /algorithm-factory/ldsmdb
+ldsm_db_marathon_id: /hospital-database/ldsmdb
 
 # Pin the database to a particular host as it needs to store its files in a known place. The hostname should be the name known by Marathon / Mesos
-ldsm_db_marathon_host: '{{ inventory_hostname }}'
+ldsm_db_marathon_host: '{{ marathon_hostname }}'
 
 # The user running the Docker container for Postgres, default to '999' (postgres user in the Postgres docker container)
 # TODO: use user remapping when this functionality will be available per run (not possible today with Docker 1.12)
@@ -52,6 +52,6 @@ ldsm_db_cleanup: false
 flyway_version: "4.0.3"
 
 # URL to marathon master internal to the current cluster. You need to ensure that Ansible can reach that URL.
-internal_marathon_url: http://localhost:5080
+internal_marathon_url: "http://{{ marathon_hostname }}:{{ marathon_port }}"
 
 in_vagrant: false

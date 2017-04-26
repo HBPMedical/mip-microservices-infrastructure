@@ -1,0 +1,26 @@
+---
+# Dual Leader/Follower configuration
+
+zookeeper_hosts:
+  - host: "{{ ansible_fqdn }}" # the machine running zookeeper
+    id: 1
+
+mesos_hostname: "{{ ansible_fqdn }}"
+mesos_cluster: "lren_cluster"
+mesos_containerizers: "docker,mesos"
+
+mesos_leader_port: "5050"
+mesos_follower_port: "5051"
+mesos_zk_port: 2181
+mesos_zk_hosts: "{{ ansible_fqdn }}:{{ mesos_zk_port }}"
+
+marathon_hostname: "{{ ansible_fqdn }}"
+marathon_port: "5080"
+
+chronos_hostname: "{{ ansible_fqdn }}"
+chronos_port: "4400"
+
+# We do not have access to a proper DNS in Vagrant
+chronos_docker_parameters:
+  - key: 'add-host'
+    value: "demo:{{ ip_address }}"

@@ -28,7 +28,7 @@ woken_docker_image_basename: hbpmip/woken
 woken_docker_image: "{{ woken_docker_image_basename }}:{{ woken_version }}"
 
 # Attach the woken application to a particular host. The hostname should be the name known by Marathon / Mesos
-#woken_marathon_host:
+woken_marathon_host: "{{ marathon_hostname }}"
 # Set of constraints to use to place woken on some particular host(s)
 woken_marathon_constraints: [["hostname", "CLUSTER", "{{ woken_marathon_host }}"]]
 
@@ -80,7 +80,7 @@ internal_chronos_url: http://default:4400
 chronos_marathon_id: /algorithm-factory/chronos
 
 # URL to Marathon master internal to the current cluster. You need to ensure that Ansible can reach that URL.
-internal_marathon_url: http://localhost:5080
+internal_marathon_url: "http://{{ marathon_hostname }}:{{ marathon_port }}"
 
 woken_dependencies:
   - '{{ chronos_marathon_id }}'

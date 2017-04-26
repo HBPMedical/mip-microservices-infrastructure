@@ -7,7 +7,7 @@ portal_frontend_version: latest
 portal_frontend_marathon_id: /portal/portal-frontend
 
 # Attach Portal frontend to a particular host. The hostname should be the name known by Marathon / Mesos
-portal_frontend_marathon_host: '{{ inventory_hostname }}'
+portal_frontend_marathon_host: '{{ marathon_hostname }}'
 # Set of constraints to use to place Portal frontend on some particular host(s)
 portal_frontend_marathon_constraints: [["hostname", "CLUSTER", "{{ portal_frontend_marathon_host }}"]]
 # Number of instances of Portal frontend to launch

@@ -1,65 +1,284 @@
 ---
 
-python_location: "/usr/bin/python3"
-python_pip: "/usr/bin/pip3"
+########################################
+# General settings
+########################################
 
-java_oracle_distribution: "jdk"
+timezone: "Europe/Zurich"
+ffm_timzone: "Europe/Zurich"
+ffm_postfix_mode: 'smarthost'
+# postfix smarthost only needed if ffm_postfix_mode equals 'smarthost'
+ffm_fqdn_smtp_relay: "smtp.chuv.ch"
 
-#######################################################################
-# 0. Technical Management Runtime
-# port range 1000-1099
-tmr_mesos_leader_port: "1050"
-tmr_mesos_follower_port: "1051"
+unattended_mail: ludovic.claude@chuv.ch
+ffm_logwatch_email: ludovic.claude@chuv.ch
 
-tmr_zk_port: "1052"
+use_host_domain: false
+host_domain: chuv.ch
 
-tmr_marathon_port: "1080"
+docker_opts: "--storage-driver=overlay --dns 155.105.251.102 --dns 155.105.251.86"
 
-tmr_hostname: "{{ inventory_hostname }}"
-tmr_timezone: "Europe/Zurich"
-tmr_postfix_mode: "smarthost"
-# postfix smarthost only needed if ffm_postfix_mode equals "smarthost"
-tmr_fqdn_smtp_relay: "mail.epfl.ch"
+internal_mesos_url: "http://{{ ansible_fqdn }}:5050"
+internal_marathon_url: "http://{{ ansible_fqdn }}:5080"
+internal_chronos_url: "http://{{ ansible_fqdn }}:4400"
+internal_woken_url: "http://{{ ansible_fqdn }}:8087"
+internal_portal_backend_server: "{{ ansible_fqdn }}:{{ portal_backend_port }}"
 
-tmr_unattended_mail: "lionel.sambuc@epfl.ch"
-tmr_host_domain: "epfl.ch"
+python_location: '/usr/bin/python3'
+python_pip: '/usr/bin/pip3'
 
-tmr_dns_servers: "--dns 128.178.15.228 --dns 128.178.15.229"
 
-#######################################################################
-# 1. Data factory
-# port range 1100-1199
-airflow_web_server_port: "1180"
+########################################
+# Airflow configuration
+########################################
 
-#######################################################################
-# 2. Hospital Databases Bundle
-# port range 1200-1299
-hdb_hostname: "{{ tmr_hostname }}"
-hdb_port: "1200"
-hdb_ui_port: "1201"
-hdb_data_dir: '/srv/docker/ldsmdb/data'
-hdb_raw_data_dir: "/data/ldsm"
+airflow_scheduler_cpus: 0.2
+airflow_scheduler_mem: 2560.0
+airflow_webserver_cpus: 0.2
+airflow_webserver_mem: 512.0
 
-hdb_federation_master_host: "{{ hdb_hostname }}"
-hdb_federation_master_port: "1290"
-hdb_federation_db_user: "admin"
+airflow_web_server_port: 4080
+airflow_web_server_host: '0.0.0.0' # grant access to all
+airflow_web_base_url: 'http://{{ ansible_fqdn }}:14080'
 
-#######################################################################
-# 3. Algorithm factory
-# port range 1300-1399
-af_hostname: "{{ tmr_hostname }}"
-af_db_port: "1300"
-af_chronos_port: "1301"
-af_woken_http_port: "1387"
-af_woken_akka_port: "1388"
-af_woken_validation_akka_port: "1389"
+airflow_scheduler_expected_activity_period: '2 hours'
+airflow_job_heartbeat_sec: 30
+airflow_scheduler_heartbeat_sec: 30
 
-#######################################################################
-# 4. Web Portal
-# port range 1400-1499
-wp_hostname: "{{ tmr_hostname }}"
-wp_frontend_port: "1490"
-wp_backend_port: "1480"
-wp_db_port: "1400"
-wp_db_hostname: "{{ tmr_hostname }}"
-wp_frontend_scheme: "https"
+airflow_db_host: "{{ ansible_fqdn }}"
+airflow_db_port: 4321
+airflow_sql_alchemy_conn: "postgresql://airflow:{{ airflow_db_password }}@{{ airflow_db_host }}:{{ airflow_db_port }}/airflow"
+
+airflow_scripts_root: '/opt/airflow-scripts'
+airflow_scripts_verify_commit: true
+airflow_dags_folder: '{{ airflow_scripts_root }}/airflow-mri-preprocessing-dags'
+airflow_plugins_folder: '{{ airflow_scripts_root }}/airflow-imaging-plugins'
+
+airflow_load_examples: false
+
+airflow_user: 'airflow'
+airflow_group: 'airflow'
+airflow_home: '/usr/local/airflow'
+airflow_startup: 'marathon'
+airflow_mesos_master: '{{ ansible_fqdn }}:5050'
+airflow_db_databases: "airflow,data_catalog,i2b2,mipmap"
+
+airflow_pool_io_intensive: 1
+airflow_pool_remote_file_copy: 1
+airflow_pool_image_preprocessing: 1
+
+########################################
+# Databases configuration
+########################################
+
+data_catalog_db_deploy: no
+data_catalog_db_host: '{{ airflow_db_host }}'
+data_catalog_db_port: '{{ airflow_db_port }}'
+data_catalog_db_sql_alchemy_conn: "postgresql://data_catalog:{{ data_catalog_db_password }}@{{ data_catalog_db_host }}:{{ data_catalog_db_port }}/data_catalog"
+
+i2b2_db_deploy: no
+i2b2_db_host: '{{ airflow_db_host }}'
+i2b2_db_port: '{{ airflow_db_port }}'
+i2b2_db_sql_alchemy_conn: "postgresql://i2b2:{{ i2b2_db_password }}@{{ i2b2_db_host }}:{{ i2b2_db_port }}/i2b2"
+
+mipmap_db_deploy: no
+mipmap_db_host: '{{ airflow_db_host }}'
+mipmap_db_port: '{{ airflow_db_port }}'
+mipmap_db_config_file: '/dev/null'
+
+
+########################################
+# Data Factory global settings
+########################################
+
+data_factory_datasets: 'clm'  # 'main,clm,ppmi,edsd'
+data_factory_email_errors_to: 'ludovic.claude@chuv.ch'
+data_factory_slack_channel: '#chuv-data'
+data_factory_slack_channel_user: 'Airflow'
+
+
+########################################
+# Configuration for LREN dataset
+########################################
+
+main_dataset_label: 'LREN'
+main_reorganisation_pipelines: ''
+main_reorganisation_scanners: ''
+main_reorganisation_copy_all_to_local_output_folder: ''
+main_reorganisation_dicom_reorganise_output_folder: ''
+main_reorganisation_nifti_reorganise_output_folder: ''
+main_preprocessing_input_folder: '/mnt/filearc/CRN/LREN/IRMMP16/prisma'
+main_preprocessing_input_config: 'boost'
+main_preprocessing_max_active_runs: 30
+main_preprocessing_min_free_space: 0.3
+main_preprocessing_misc_library_path: '{{ airflow_scripts_root }}/mri-preprocessing-pipeline/Miscellaneous&Others'
+main_preprocessing_pipelines_path: '{{ airflow_scripts_root }}/mri-preprocessing-pipeline/Pipelines'
+main_preprocessing_protocols_definition_file: '{{ airflow_scripts_root }}/mri-preprocessing-pipeline/Protocols_definition.txt'
+main_preprocessing_scanners: 'daily' # TODO add continuous
+main_preprocessing_pipelines: 'dicom_to_nifti,mpm_maps,neuro_morphometric_atlas,export_features,catalog_to_i2b2'
+main_preprocessing_copy_to_local_output_folder: '/mnt/HDD2/LREN/incoming'
+main_preprocessing_dicom_select_t1_output_folder: ''
+main_preprocessing_dicom_to_nifti_output_folder: '/mnt/HDD2/LREN/nifti'
+main_preprocessing_dicom_to_nifti_backup_folder: '/mnt/filerc/LREN/SHARE/AIR_VBQ_Output_All/DataNifti_All'
+main_preprocessing_mpm_maps_output_folder: '/mnt/HDD2/LREN/mpm_maps'
+main_preprocessing_mpm_maps_backup_folder: '/mnt/filerc/LREN/SHARE/AIR_VBQ_Output_All/MPMs_All'
+main_preprocessing_mpm_maps_protocols_definition_file: '{{ airflow_scripts_root }}/mri-preprocessing-pipeline/Protocols_definition.txt'
+main_preprocessing_neuro_morphometric_atlas_output_folder: '/mnt/HDD2/LREN/neuro_morphometric_atlas'
+main_preprocessing_neuro_morphometric_atlas_backup_folder: ''
+main_ehr_min_free_space: 0.3
+main_ehr_scanners: ''
+main_ehr_pipelines: ''
+main_ehr_version_incoming_ehr_output_folder: ''
+main_preprocessing_neuro_morphometric_atlas_tpm_template: 'nwTPM_sl3.nii'  # We might want to keep this one for LREN
+
+
+########################################
+# SPM configuration
+########################################
+
+spm_dir: /opt/spm12
+
+########################################
+# Configuration for Hospital Database
+########################################
+
+ldsm_db_host: "{{ ansible_fqdn }}"
+ldsm_db_port: 31434
+ldsm_db_user: ldsm
+ldsm_db_name: ldsm
+ldsm_db_jdbc_url: "jdbc:postgresql://{{ ldsm_db_host }}:{{ ldsm_db_port }}/{{ ldsm_db_name }}"
+ldsm_db_jdbc_driver: "org.postgresql.Driver"
+ldsm_db_jdbc_jar: "/usr/lib/R/libraries/postgresql-9.4-1201.jdbc41.jar"
+
+ldsm_db_data_dir: '/srv/docker/ldsmdb/data'
+ldsm_db_raw_data_dir: '/dataset'
+
+lsdm_db_volumes:
+  - containerPath: '/data'
+    hostPath: "{{ ldsm_db_data_dir }}"
+    mode: RW
+  - containerPath: '/datasets'
+    hostPath: "{{ ldsm_db_raw_data_dir }}"
+    mode: RO
+
+postgresraw_ui_cpus: 0.2
+postgresraw_ui_mem: 100.0
+
+########################################
+# Configuration of MIP Local for CLM
+########################################
+
+portal_frontend_marathon_host: '{{ ansible_fqdn }}'
+portal_frontend_scheme: 'http'
+portal_frontend_virtual_host: '{{ ansible_fqdn }}'
+portal_frontend_cpus: 0.2
+portal_frontend_mem: 20.0
+# Enable Google Analytics
+enable_analytics: false
+
+portal_backend_marathon_host: "{{ ansible_fqdn }}"
+portal_backend_port: 4090
+portal_backend_akka_port: 4089
+portal_backend_cpus: 0.2
+portal_backend_mem: 256.0
+portal_backend_exareme_url: 'http://hbps2.chuv.ch:9090'
+portal_backend_frontend_login_url: '{{ portal_frontend_scheme }}://{{ portal_frontend_virtual_host }}/services/login/hbp'
+portal_backend_frontend_after_login_url: '{{ portal_frontend_scheme }}://{{ portal_frontend_virtual_host }}/home'
+portal_backend_frontend_after_logout_url: '{{ portal_frontend_scheme }}://{{ portal_frontend_virtual_host }}/services/login/hbp'
+
+portal_backend_env:
+  PORTAL_DB_URL: "{{ portal_db_jdbc_url }}"
+  PORTAL_DB_SCHEMA: "public"
+  PORTAL_DB_USER: "{{ portal_db_user }}"
+  PORTAL_DB_PASSWORD: "{{ portal_db_password }}"
+  META_DB_URL: "{{ meta_db_jdbc_url }}"
+  META_DB_SCHEMA: "public"
+  META_DB_USER: "{{ meta_db_user }}"
+  META_DB_PASSWORD: "{{ meta_db_password }}"
+  SCIENCE_DB_URL: "{{ ldsm_db_jdbc_url }}"
+  SCIENCE_DB_SCHEMA: "public"
+  SCIENCE_DB_MAIN_TABLE: "{{ ldsm_db_name }}"
+  SCIENCE_DB_USER: "{{ ldsm_db_user }}"
+  SCIENCE_DB_PASSWORD: "{{ ldsm_db_password }}"
+  AUTHENTICATION: 1
+  CLIENT_ID: '{{ portal_backend_hbp_client_id }}'
+  CLIENT_SECRET: '{{ portal_backend_hbp_client_secret }}'
+  LOGGING_LEVEL_WEB: 'DEBUG'
+  LOGGING_LEVEL_HIBERNATE: 'INFO'
+  CONTEXT_PATH: ''
+  SESSION_TIMEOUT: '2592000'
+  WOKEN_URL: '{{ internal_woken_url }}'
+  WOKEN_HOST: '{{ woken_marathon_host }}'
+  WOKEN_PORT: '{{ woken_akka_port }}'
+  WOKEN_PATH: '{{ woken_path }}'
+  EXAREME_URL: '{{ portal_backend_exareme_url }}'
+  FRONTEND_LOGIN_URL: '{{ portal_backend_frontend_login_url }}'
+  FRONTEND_AFTER_LOGIN_URL: '{{ portal_backend_frontend_after_login_url }}'
+  FRONTEND_AFTER_LOGOUT_URL: '{{ portal_backend_frontend_after_logout_url }}'
+
+portal_db_host: "{{ ansible_fqdn }}"
+portal_db_marathon_host: "{{ ansible_fqdn }}"
+portal_db_port: 31433
+portal_db_user: "portal"
+#portal_db_password: -- defined in host-vars/demo
+portal_db_jdbc_url: "jdbc:postgresql://{{ portal_db_host }}:{{ portal_db_port }}/portal"
+portal_db_jdbc_driver: "org.postgresql.Driver"
+portal_db_jdbc_jar: "/usr/lib/R/libraries/postgresql-9.4-1201.jdbc41.jar"
+portal_db_admin_user: "postgres"
+# portal_db_admin_password: -- defined in host-vars/demo (install)
+portal_db_databases: "portal,meta"
+
+# Deploy meta database inside the same Postgres instance created for portal db
+meta_db_deploy: no
+meta_db_host: "{{ portal_db_host }}"
+meta_db_port: "{{ portal_db_port }}"
+meta_db_jdbc_url: "jdbc:postgresql://{{ meta_db_host }}:{{ meta_db_port }}/meta"
+meta_db_local_project_dir: '{{ play_dir }}/src/clm-meta-db'
+meta_db_user: meta
+meta_db_admin_user: "postgres"
+
+analytics_db_host: "{{ ansible_fqdn }}"
+analytics_db_marathon_host: "{{ ansible_fqdn }}"
+analytics_db_port: 31432
+analytics_db_user: "analytics"
+# analytics_db_password: -- defined in host-vars/demo (install)
+analytics_db_jdbc_url: "jdbc:postgresql://{{ analytics_db_host }}:{{ analytics_db_port }}/analytics"
+analytics_db_jdbc_driver: "org.postgresql.Driver"
+analytics_db_jdbc_jar: "/usr/lib/R/libraries/postgresql-9.4-1201.jdbc41.jar"
+analytics_db_admin_user: "postgres"
+# analytics_db_admin_password: -- defined in host-vars/demo (install)
+
+woken_data_db_host: "{{ ldsm_db_host }}"
+woken_data_db_port: "{{ ldsm_db_port }}"
+woken_data_db_user: "{{ ldsm_db_user }}"
+woken_data_db_password: "{{ ldsm_db_password }}"
+woken_data_db_jdbc_url: "{{ ldsm_db_jdbc_url }}"
+woken_data_db_jdbc_driver: "org.postgresql.Driver"
+woken_data_db_jdbc_jar: "/usr/lib/R/libraries/postgresql-9.4-1201.jdbc41.jar"
+
+woken_metadata_db_host: "{{ meta_db_host }}"
+woken_metadata_db_port: "{{ meta_db_port }}"
+woken_metadata_db_user: "{{ meta_db_user }}"
+woken_metadata_db_password: "{{ meta_db_password }}"
+woken_metadata_db_jdbc_url: "{{ meta_db_jdbc_url }}"
+woken_metadata_db_jdbc_driver: "org.postgresql.Driver"
+woken_metadata_db_jdbc_jar: "/usr/lib/R/libraries/postgresql-9.4-1201.jdbc41.jar"
+
+woken_http_port: 8087
+woken_akka_port: 8088
+woken_path: '/user/entrypoint'
+woken_docker_network: HOST
+woken_marathon_host: "{{ ansible_fqdn }}"
+woken_cpus: 0.2
+# Amount of memory in mb reserved for woken
+woken_mem: 256.0
+
+woken_role: mip_node
+woken_main_table: "science_data"
+
+woken_validation_akka_port: 4082
+woken_validation_docker_network: HOST
+woken_validation_marathon_host: "{{ ansible_fqdn }}"
+woken_validation_cpus: 0.2
+# Amount of memory in mb reserved for woken validation
+woken_validation_mem: 256.0

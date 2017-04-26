@@ -17,8 +17,6 @@
     - "{{ play_dir }}/vars/versions.yml"
 
   pre_tasks:
-    - name: Install curl
-      apt: name=curl state=present
 
     - name: Set default value for skipped_roles
       set_fact:

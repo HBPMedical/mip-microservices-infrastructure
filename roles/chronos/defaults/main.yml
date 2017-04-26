@@ -1,6 +1,7 @@
 ---
 
 chronos_marathon_id: /algorithm-factory/chronos
+chronos_marathon_host: '{{ ansible_fqdn }}'
 
 chronos_port: 4400
 chronos_docker_image_basename: mesoscloud/chronos
@@ -8,8 +9,10 @@ chronos_docker_image: "{{ chronos_docker_image_basename }}:{{ chronos_version }}
 
 chronos_version: "2.4.0-ubuntu-14.04"
 
-chronos_zk_mesos_master: 'zk://node-1:2181,node-2:2181,node-3:2181/mesos'
-chronos_zk_hosts: 'node-1:2181,node-2:2181,node-3:2181'
+chronos_zk_port: 2181
+chronos_zk_hosts: "{% for host in groups['zookeeper'] %}{{ hostvars[host]['ansible_fqdn'] }}:{{ chronos_zk_port }}{% if not loop.last %},{% endif %}{% endfor %}"
+chronos_zk_mesos_master: 'zk://{{ chronos_zk_hosts }}/mesos'
+
 chronos_failure_retry: 5000
 chronos_disable_after_failures: 1
 chronos_cluster_name: '{{ mesos_cluster }}'

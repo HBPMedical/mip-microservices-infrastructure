@@ -1,4 +1,7 @@
 ---
+
+in_vagrant: true
+
 #######################################################################
 # 0. Technical Management Runtime
 ffm_root_password: "start1234"
@@ -51,7 +54,8 @@ mri_db_admin_password: "{{ airflow_db_admin_password }}"
 
 #######################################################################
 # 2. Hospital Databases Bundle
-ldsm_db_admin_password: "start1234"
+ldsm_db_password: "start1234"
+ldsm_db_admin_password: "admin1234"
 
 #######################################################################
 # 3. Algorithm factory
